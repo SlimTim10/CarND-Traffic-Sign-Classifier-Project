@@ -26053,13 +26053,14 @@ MaPPHu7CgPAAAAAASUVORK5CYII=
 <p>First, I converted each image from RGB to grayscale. This reduces the input shape, thus reducing the training time.</p>
 <p>Then, I normalized the image data (by scaling each feature to the range 0-1) to improve training time and reduce the chances of getting stuck in local optima.</p>
 <p>Upon testing, the network performs better with color images (without using this preprocessing).</p>
+<p>The function skimage.color.rgb2gray() removes the color channel, so instead of an example image being converted from 32x32x3 to 32x32x1, it is converted to 32x32. This numpy array does not work with the network model, so I chose to convert it back to 32x32x3.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">### Generate data additional data (OPTIONAL!)</span>
@@ -26146,7 +26147,7 @@ Test Set:       12630 samples
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">### Define your architecture here.</span>
@@ -26264,23 +26265,45 @@ Test Set:       12630 samples
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer:</strong></p>
 <p>Input shape going into first convolutional layer: 32x32x3</p>
-<p>Convolution layer 1: output shape 28x28x6</p>
+<p>Convolution layer 1:</p>
+<ul>
+<li>strides: 1, 1, 1, 1</li>
+<li>padding: valid</li>
+<li>output shape: 28x28x6</li>
+</ul>
 <p>Activation 1: ReLu</p>
-<p>Pooling layer 1: output shape 14x14x6</p>
-<p>Convolution layer 2: output shape 10x10x16</p>
+<p>Pooling layer 1:</p>
+<ul>
+<li>kernel size: 1, 2, 2, 1</li>
+<li>strides: 1, 2, 2, 1</li>
+<li>padding: valid</li>
+<li>output shape: 14x14x6</li>
+</ul>
+<p>Convolution layer 2:</p>
+<ul>
+<li>strides: 1, 1, 1, 1</li>
+<li>padding: valid</li>
+<li>output shape: 10x10x16</li>
+</ul>
 <p>Activation 2: ReLu</p>
-<p>Pooling layer 2: output shape 5x5x16</p>
+<p>Pooling layer 2:</p>
+<ul>
+<li>kernel size: 1, 2, 2, 1</li>
+<li>strides: 1, 2, 2, 1</li>
+<li>padding: valid</li>
+<li>output shape: 5x5x16</li>
+</ul>
 <p>Flatten layer: output shape 1D</p>
 <p>Fully connected layer 1: 120 outputs</p>
 <p>Activation 3: ReLu</p>
-<p>Fully connected layer 2: 10 outputs</p>
+<p>Fully connected layer 2: 43 outputs</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[32]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">### Train your model here.</span>
@@ -26307,12 +26330,13 @@ Test Set:       12630 samples
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[33]:</div>
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Training pipeline</span>
 
-<span class="n">EPOCHS</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="n">MIN_EPOCHS</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">MAX_EPOCHS</span> <span class="o">=</span> <span class="mi">40</span>
 <span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">128</span>
 <span class="n">RATE</span> <span class="o">=</span> <span class="mf">0.002</span>
 
@@ -26333,7 +26357,7 @@ Test Set:       12630 samples
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[34]:</div>
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Model evaluation</span>
@@ -26360,7 +26384,7 @@ Test Set:       12630 samples
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[36]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Training</span>
@@ -26373,7 +26397,11 @@ Test Set:       12630 samples
     
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training...&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">EPOCHS</span><span class="p">):</span>
+    
+    <span class="n">training_done</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">prev_accuracy</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">MAX_EPOCHS</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">training_done</span><span class="p">:</span>
         <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">shuffle</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_examples</span><span class="p">,</span> <span class="n">BATCH_SIZE</span><span class="p">):</span>
             <span class="n">end</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">BATCH_SIZE</span>
@@ -26381,9 +26409,13 @@ Test Set:       12630 samples
             <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">training_operation</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">batch_x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">batch_y</span><span class="p">})</span>
             
         <span class="n">validation_accuracy</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">X_validation</span><span class="p">,</span> <span class="n">y_validation</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">validation_accuracy</span> <span class="o">&lt;=</span> <span class="n">prev_accuracy</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">MIN_EPOCHS</span><span class="p">:</span>
+            <span class="n">training_done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">prev_accuracy</span> <span class="o">=</span> <span class="n">validation_accuracy</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;EPOCH </span><span class="si">{}</span><span class="s2"> ...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Validation Accuracy = </span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">validation_accuracy</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">()</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
         
     <span class="n">save_path</span> <span class="o">=</span> <span class="s1">&#39;lenet&#39;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">save_path</span><span class="p">):</span>
@@ -26405,79 +26437,46 @@ Test Set:       12630 samples
 <pre>Training...
 
 EPOCH 1 ...
-Validation Accuracy = 0.055
+Validation Accuracy = 0.053
 
 EPOCH 2 ...
-Validation Accuracy = 0.185
+Validation Accuracy = 0.057
 
 EPOCH 3 ...
-Validation Accuracy = 0.359
+Validation Accuracy = 0.083
 
 EPOCH 4 ...
-Validation Accuracy = 0.524
+Validation Accuracy = 0.152
 
 EPOCH 5 ...
-Validation Accuracy = 0.629
+Validation Accuracy = 0.338
 
 EPOCH 6 ...
-Validation Accuracy = 0.661
+Validation Accuracy = 0.481
 
 EPOCH 7 ...
-Validation Accuracy = 0.717
+Validation Accuracy = 0.541
 
 EPOCH 8 ...
-Validation Accuracy = 0.732
+Validation Accuracy = 0.585
 
 EPOCH 9 ...
-Validation Accuracy = 0.771
+Validation Accuracy = 0.641
 
 EPOCH 10 ...
-Validation Accuracy = 0.765
+Validation Accuracy = 0.689
 
 EPOCH 11 ...
-Validation Accuracy = 0.760
+Validation Accuracy = 0.722
 
 EPOCH 12 ...
-Validation Accuracy = 0.814
+Validation Accuracy = 0.734
 
 EPOCH 13 ...
-Validation Accuracy = 0.798
+Validation Accuracy = 0.771
 
 EPOCH 14 ...
-Validation Accuracy = 0.823
-
-EPOCH 15 ...
-Validation Accuracy = 0.826
-
-EPOCH 16 ...
-Validation Accuracy = 0.823
-
-EPOCH 17 ...
-Validation Accuracy = 0.797
-
-EPOCH 18 ...
-Validation Accuracy = 0.824
-
-EPOCH 19 ...
-Validation Accuracy = 0.838
-
-EPOCH 20 ...
-Validation Accuracy = 0.848
-
-EPOCH 21 ...
-Validation Accuracy = 0.828
-
-EPOCH 22 ...
-Validation Accuracy = 0.826
-
-EPOCH 23 ...
-Validation Accuracy = 0.831
-
-EPOCH 24 ...
-Validation Accuracy = 0.821
-
-EPOCH 25 ...
-Validation Accuracy = 0.849
+Validation Accuracy = 0.763
 
 Model saved
 </pre>
@@ -26537,7 +26536,7 @@ Model saved
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer:</strong></p>
-<p>After testing 4 different optimizers, AdamOptimizer performed the best. I found the consistently best results by choosing:</p>
+<p>After testing 4 different optimizers, AdamOptimizer performed the best. With trial and error, I found the consistently best results by choosing:</p>
 
 <pre><code>epochs = 25
 batch size = 128
@@ -26546,6 +26545,7 @@ learning rate = 0.002
 Hyperparameters
 mu = 0
 sigma = 0.01</code></pre>
+<p>I modified the training to include a minimum number of epochs, a maximum number of epochs, and a stop flag when the validation accuracy is equal to or less than the previous validation accuracy.</p>
 
 </div>
 </div>
@@ -26567,6 +26567,7 @@ sigma = 0.01</code></pre>
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer:</strong></p>
 <p>I used the LeNet architecture and tested different optimizers and parameters with a process of trial and error. I think this architecture is suitable for the current problem because it has been shown to be effective on similar types of images.</p>
+<p>In training, I included a minimum number of epochs, a maximum number of epochs, and a stop flag when the validation accuracy is equal to or less than the previous validation accuracy.</p>
 <p>Some of my trial and error results were as follows.</p>
 
 <pre><code>EPOCHS = 40
